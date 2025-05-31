@@ -1,9 +1,9 @@
-import {Text, View, ScrollView} from 'react-native';
+import {Text, View, Animated} from 'react-native';
 import { useSelector } from 'react-redux';
 import { Card } from 'react-native-elements';
 import { baseUrl } from '../shared/baseUrl';
 import Loading from '../components/loadingComponent';
-
+import { useEffect, useRef } from 'react';
 
 const FeaturedItem = (props) => {
     const {item} = props;
@@ -45,6 +45,12 @@ const HomeScreen = () => {
     const campsites = useSelector((state)=> state.campsites);
     const promotions = useSelector((state)=> state.promotions);
     const partners = useSelector((state)=> state.partners);
+    const scaleValue = useRef(new Animated.Value(0)).current //current prop that holds the value
+    const scaleAnimation = Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 1500,
+        useNativeDriver: true
+    })
     /*
     * find vs. filter
     * find returns a the very first thing that meets the criteria
@@ -53,6 +59,10 @@ const HomeScreen = () => {
     const featuredCampsite = campsites.campsitesArray.find((item)=>item.featured);
     const featuredPromotion = promotions.promotionsArray.find((item)=>item.featured);
     const featuredPartner = partners.partnersArray.find((item)=>item.featured);
+    useEffect(()=> {
+        scaleAnimation.start();
+
+    }, []);
     return ( 
         /*ScrollView vs. FlatList 
         * ScrollView loads all child components at once
@@ -62,7 +72,7 @@ const HomeScreen = () => {
         * ScrollView is better here since we have a fixed number of components
         */
 
-        <ScrollView>
+        <Animated.ScrollView style = {{transform: [{scale: scaleValue}]}}>
             <FeaturedItem 
                 item = {featuredCampsite} 
                 isLoading = {campsites.isLoading}
@@ -78,7 +88,7 @@ const HomeScreen = () => {
                 isLoading = {partners.isLoading}
                 errMess = {partners.errMess}
             />
-        </ScrollView>
+        </Animated.ScrollView>
     )
 }
 
